@@ -16,14 +16,18 @@ public class AccountDAO
 
         try 
         {
+            //Prep Statement
             String sql = "";
             PreparedStatement ps = connection.prepareStatement(sql);
 
+            //Insert Statement Values
             ps.setString(1, username);
             ps.setString(2, password);
-
+            
+            //Query DB
             ResultSet rs = ps.executeQuery();
 
+            //Assemble account object from result
             while (rs.next())
             {
                 Account account = new Account(rs.getInt("account_id"),
