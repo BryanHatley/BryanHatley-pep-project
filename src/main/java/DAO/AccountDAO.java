@@ -17,7 +17,7 @@ public class AccountDAO
         try 
         {
             //Prep Statement
-            String sql = "";
+            String sql = "SELECT * FROM account WHERE username = ? AND password = ?";
             PreparedStatement ps = connection.prepareStatement(sql);
 
             //Insert Statement Values

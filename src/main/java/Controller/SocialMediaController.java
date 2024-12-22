@@ -67,7 +67,7 @@ public class SocialMediaController {
         //Return account to user as JSON object or return a status code of 400
         if (loggedInAccount == null)
         {
-            ctx.status(400);
+            ctx.status(401);
         }
         else
         {
