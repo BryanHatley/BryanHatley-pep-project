@@ -1,5 +1,7 @@
 package Controller;
 
+import static org.mockito.ArgumentMatchers.nullable;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -35,16 +37,42 @@ public class SocialMediaController {
         return app;
     }
 
+    //Create an account in the database if requirement in service are met
     private void postCreateAccountHandler(Context ctx) throws JsonProcessingException
     {
+        //Parse JSON input to an Account object, then add object to database
         ObjectMapper mapper = new ObjectMapper();
         Account account = mapper.readValue(ctx.body(), Account.class);
+        Account newAccount = accountService.createAccount(account);
+        
+        //Return account to user as JSON object or return a status code of 400
+        if (newAccount == null)
+        {
+            ctx.status(400);
+        }
+        else
+        {
+            ctx.json(mapper.writeValueAsString(newAccount));
+        }
 
     }
 
-    private void postLoginAccountHandler(Context ctx)
+    private void postLoginAccountHandler(Context ctx) throws JsonProcessingException
     {
-        int i = 0;
+        //Parse JSON input to an Account object, then check if account is in database
+        ObjectMapper mapper = new ObjectMapper();
+        Account account = mapper.readValue(ctx.body(), Account.class);
+        Account loggedInAccount = accountService.loginAccount(account);
+         
+        //Return account to user as JSON object or return a status code of 400
+        if (loggedInAccount == null)
+        {
+            ctx.status(400);
+        }
+        else
+        {
+            ctx.json(mapper.writeValueAsString(loggedInAccount));
+        }
     }
 
     /**
