@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +42,6 @@ public class MessageDAO
     public Message getMessageByID(int message_id)
     {
         Connection connection = ConnectionUtil.getConnection();
-        List<Message> messages = new ArrayList<>();
 
         try
         {
@@ -102,7 +102,7 @@ public class MessageDAO
         {
             //Set up statement
             String sql = "INSERT INTO message (posted_by, message_text, time_posted_epoch) VALUES (?, ?, ?)";
-            PreparedStatement ps = connection.prepareStatement(sql);
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
             //Finish statement
             ps.setInt(1, message.getPosted_by());
@@ -141,12 +141,7 @@ public class MessageDAO
 
             //Insert new Account
             ps.executeUpdate();
-            ResultSet rs = ps.getGeneratedKeys();
-            if(rs.next()) 
-            {
-                int generated_message_id = (int) rs.getLong(1);
-                return new Message(generated_message_id, message.getPosted_by(), message.getMessage_text(), message.getTime_posted_epoch());
-            }
+            return getMessageByID(message.getMessage_id());
         }
         catch (SQLException e) 
         {
@@ -163,16 +158,11 @@ public class MessageDAO
         {
             String sql = "DELETE FROM message WHERE message_id = ?";
             PreparedStatement ps = connection.prepareStatement(sql);
+            Message message = getMessageByID(message_id);
 
             ps.setInt(1, message_id);
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next())
-            {
-                Message message = new Message(rs.getInt("message_id"), rs.getInt("posted_by"),
-                                  rs.getString("message_text"), rs.getLong("time_posted_epoch"));
-                return message;
-            }
+            ps.executeUpdate();
+            return message;
         }
         catch (SQLException e)
         {
