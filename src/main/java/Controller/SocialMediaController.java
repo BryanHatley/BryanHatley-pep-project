@@ -11,7 +11,6 @@ import Service.AccountService;
 import Service.MessageService;
 import java.util.List;
 import java.util.Objects;
-import java.util.ArrayList;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 
@@ -36,7 +35,6 @@ public class SocialMediaController {
      */
     public Javalin startAPI() {
         Javalin app = Javalin.create();
-        app.get("example-endpoint", this::exampleHandler);
         app.post("/register", this::postCreateAccountHandler);
         app.post("/login", this::postLoginAccountHandler);
         app.post("/messages", this::postCreateMessageHandler);
@@ -105,74 +103,83 @@ public class SocialMediaController {
         }
     }
 
+    //Get all messages
     private void getAllMessagesHandler(Context ctx)
     {
         List<Message> messages = messageService.getAllMessages();
         ctx.json(messages);
     }
 
+    //Get a specific message
     private void getMessageByIDHandler(Context ctx)
     {
+        //Get message_id from path
         int message_id = Integer.parseInt(Objects.requireNonNull(ctx.pathParam("message_id")));
+        //Get messages
         Message message = messageService.getMessageByID(message_id);
+        //If no message return 200 and a blank json object
         if (message == null)
         {
             ctx.status(200);
             ctx.json("");
         }
+        //Return message
         else
         {
             ctx.json(message);
         }
     }
 
+    //Delete a message
     private void deleteMessageHandler(Context ctx)
     {
+        //Get message_id from path
         int message_id = Integer.parseInt(Objects.requireNonNull(ctx.pathParam("message_id")));
+        //Delete message
         Message message = messageService.removeMessageByID(message_id);
+        //Return 200 and an empty object if no message
         if (message == null)
         {
             ctx.status(200);
             ctx.json("");
         }
+        //Return deleted message
         else
         {
             ctx.json(message);
         }
     }
 
+    //Update a message
     private void updateMessageHandler(Context ctx) throws JsonProcessingException
     {
+        //Get message_text from http body
         ObjectMapper mapper = new ObjectMapper();
         Message message = mapper.readValue(ctx.body(), Message.class);
+        //Get message_id from path
         int message_id = Integer.parseInt(Objects.requireNonNull(ctx.pathParam("message_id")));
         message.setMessage_id(message_id);
+        //Update message
         Message updatedMessage = messageService.updateMessage(message);
 
+        //Client error if no message
         if (updatedMessage == null)
         {
             ctx.status(400);
         }
+        //Return updated message
         else
         {
             ctx.json(updatedMessage);
         }
     }
 
+    //Get all messages by a single poster
     private void getMessagesByAccountIDHandler(Context ctx)
     {
+        //Get account_id from path and then get messages
         int account_id = Integer.parseInt(Objects.requireNonNull(ctx.pathParam("account_id")));
         List<Message> messages = messageService.getMessagesByPoster(account_id);
         ctx.json(messages);
     }
-
-    /**
-     * This is an example handler for an example endpoint.
-     * @param context The Javalin Context object manages information about both the HTTP request and response.
-     */
-    private void exampleHandler(Context context) {
-        context.json("sample text");
-    }
-
-
 }

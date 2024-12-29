@@ -12,6 +12,7 @@ import java.util.List;
 
 public class MessageDAO 
 {
+    //Get all messages from database
     public List<Message> getAllMessages()
     {
         Connection connection = ConnectionUtil.getConnection();
@@ -19,11 +20,14 @@ public class MessageDAO
 
         try
         {
+            //Set up statement
             String sql = "SELECT * FROM message";
-
             PreparedStatement ps = connection.prepareStatement(sql);
+            
+            //Execute statement
             ResultSet rs = ps.executeQuery();
-
+            
+            //Return messages
             while(rs.next())
             {
                 Message message = new Message(rs.getInt("message_id"), rs.getInt("posted_by"),
@@ -39,18 +43,24 @@ public class MessageDAO
         return messages;
     }
 
+    //Get a message by its id
     public Message getMessageByID(int message_id)
     {
         Connection connection = ConnectionUtil.getConnection();
 
         try
         {
+            //Set up statement
             String sql = "SELECT * FROM message WHERE message_id = ?";
             PreparedStatement ps = connection.prepareStatement(sql);
 
+            //Finish statement
             ps.setInt(1, message_id);
+
+            //Execute statement
             ResultSet rs = ps.executeQuery();
 
+            //Return the message
             while (rs.next())
             {
                 Message message = new Message(rs.getInt("message_id"), rs.getInt("posted_by"),
@@ -66,6 +76,7 @@ public class MessageDAO
         return null;
     }
 
+    //Get all messages by a single poster
     public List<Message> getMessagesByPoster(int posted_by)
     {
         Connection connection = ConnectionUtil.getConnection();
@@ -73,12 +84,17 @@ public class MessageDAO
 
         try
         {
+            //Set up statement
             String sql = "SELECT * FROM message WHERE posted_by = ?";
             PreparedStatement ps = connection.prepareStatement(sql);
 
+            //Finish statement
             ps.setInt(1, posted_by);
+            
+            //Execute statement
             ResultSet rs = ps.executeQuery();
 
+            //Return messages
             while (rs.next())
             {
                 Message message = new Message(rs.getInt("message_id"), rs.getInt("posted_by"),
@@ -94,6 +110,7 @@ public class MessageDAO
         return messages;
     }
 
+    //Create a new message
     public Message createMessage(Message message) 
     {
         Connection connection = ConnectionUtil.getConnection();
@@ -109,7 +126,7 @@ public class MessageDAO
             ps.setString(2, message.getMessage_text());
             ps.setLong(3, message.getTime_posted_epoch());
 
-            //Insert new Account
+            //Insert new Message
             ps.executeUpdate();
             ResultSet rs = ps.getGeneratedKeys();
             if(rs.next()) 
@@ -125,6 +142,7 @@ public class MessageDAO
         return null;
     }
 
+    //Update a message
     public Message updateMessage(Message message) 
     {
         Connection connection = ConnectionUtil.getConnection();
@@ -139,7 +157,7 @@ public class MessageDAO
             ps.setString(1, message.getMessage_text());
             ps.setInt(2, message.getMessage_id());
 
-            //Insert new Account
+            //Update Message
             ps.executeUpdate();
             return getMessageByID(message.getMessage_id());
         }
@@ -150,16 +168,19 @@ public class MessageDAO
         return null;
     }
     
+    //Delete a message by its ID
     public Message removeMessageByID(int message_id)
     {
         Connection connection = ConnectionUtil.getConnection();
 
         try
         {
+            //Set up statement and get message if it exists
             String sql = "DELETE FROM message WHERE message_id = ?";
             PreparedStatement ps = connection.prepareStatement(sql);
             Message message = getMessageByID(message_id);
 
+            //Finish statement and delete message
             ps.setInt(1, message_id);
             ps.executeUpdate();
             return message;
