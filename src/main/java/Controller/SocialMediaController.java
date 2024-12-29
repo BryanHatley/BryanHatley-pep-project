@@ -62,6 +62,7 @@ public class SocialMediaController {
 
     }
 
+    //Login to account
     private void postLoginAccountHandler(Context ctx) throws JsonProcessingException
     {
         //Parse JSON input to an Account object, then check if account is in database
@@ -80,6 +81,7 @@ public class SocialMediaController {
         }
     }
 
+    //Create a message
     private void postCreateMessageHandler(Context ctx) throws JsonProcessingException
     {
         //Parse JSON input to a Message object, then add object to database
